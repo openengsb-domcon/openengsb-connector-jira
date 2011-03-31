@@ -28,10 +28,11 @@
   <properties>
     <bundle.symbolicName>org.openengsb.connector.jira</bundle.symbolicName>
     <bundle.namespace>org.openengsb.connector.jira</bundle.namespace>
-    <axis.version>3.1.3</axis.version>
+    <axis.version>1.3</axis.version>
+    <axis.wsdl4j.version>1.5.1</axis.wsdl4j.version>
     <axis.wrapped.version>3.1.3.w1</axis.wrapped.version>
-    <jira.version>4.0.0</jira.version>
-    <jira.wrapped.version>${jira.version}.w1</jira.wrapped.version>
+    <jira.version>4.0</jira.version>
+    <jira.wrapped.version>${jira.version}.0.w1</jira.wrapped.version>
   </properties>
 
   <modelVersion>4.0.0</modelVersion>
@@ -68,31 +69,32 @@
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis</artifactId>
-      <version>1.3</version>
-      <scope>compile</scope>
+      <version>${axis.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis-jaxrpc</artifactId>
-      <version>1.3</version>
-      <scope>compile</scope>
+      <version>${axis.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis-saaj</artifactId>
-      <version>1.3</version>
-      <scope>compile</scope>
+      <version>${axis.version}</version>
+      <scope>provided</scope>
     </dependency>
       <dependency>
       <groupId>axis</groupId>
       <artifactId>axis-wsdl4j</artifactId>
-      <version>1.5.1</version>
-      <scope>compile</scope>
+      <version>${axis.wsdl4j.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.dolby.jira.net</groupId>
       <artifactId>jira-soap</artifactId>
-      <version>4.0</version>
+      <version>${jira.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
