@@ -65,6 +65,15 @@
     <url>http://github.com/openengsb/openengsb-connector-jira</url>
   </scm>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>axis</groupId>
