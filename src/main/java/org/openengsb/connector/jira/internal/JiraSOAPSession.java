@@ -23,8 +23,8 @@ import java.rmi.RemoteException;
 
 import javax.xml.rpc.ServiceException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.dolby.jira.net.soap.jira.JiraSoapService;
 import com.dolby.jira.net.soap.jira.JiraSoapServiceService;
@@ -37,7 +37,7 @@ import com.dolby.jira.net.soap.jira.JiraSoapServiceServiceLocator;
  */
 public class JiraSOAPSession {
 
-    private static Log log = LogFactory.getLog(JiraSOAPSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JiraSOAPSession.class);
     private JiraSoapServiceService jiraSoapServiceLocator;
     private JiraSoapService jiraSoapService;
     private String token;
@@ -52,20 +52,20 @@ public class JiraSOAPSession {
             URL webServicePort = new URL(url);
             jiraSoapServiceLocator = new JiraSoapServiceServiceLocator();
             jiraSoapService = jiraSoapServiceLocator.getJirasoapserviceV2(webServicePort);
-            log.info("SOAP Session service endpoint at " + webServicePort.toExternalForm());
+            LOGGER.info("SOAP Session service endpoint at {}", webServicePort.toExternalForm());
         } catch (ServiceException e) {
             throw new RuntimeException("ServiceException during JiraService contruction", e);
         } catch (MalformedURLException e) {
-            log.error("malformed jiraURI");
+            LOGGER.error("malformed jiraURI");
         }
     }
 
     public void connect(String userName, String password) throws RemoteException {
-        log.info("\tSetup started");
+        LOGGER.info("\tSetup started");
         setUp(jiraURI);
-        log.info("\tConnnecting via SOAP as : " + userName);
+        LOGGER.info("\tConnnecting via SOAP as : {}", userName);
         token = getJiraSoapService().login(userName, password);
-        log.info("\tConnected");
+        LOGGER.info("\tConnected");
     }
 
     public String getAuthenticationToken() {

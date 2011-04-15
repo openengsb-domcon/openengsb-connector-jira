@@ -19,16 +19,16 @@ package org.openengsb.connector.jira.internal;
 
 import static junit.framework.Assert.assertNotNull;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openengsb.domain.issue.models.Issue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class JiraServiceUT {
-    private static Log log = LogFactory.getLog(JiraServiceUT.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JiraServiceUT.class);
     // Login details
     static final String LOGIN_NAME = "soaptester";
     static final String LOGIN_PASSWORD = "soaptester";
@@ -57,7 +57,7 @@ public class JiraServiceUT {
     }
 
     public static void testCreateIssue() {
-        log.debug("test to create an issue");
+        LOGGER.debug("test to create an issue");
         Issue engsbIssue = createIssue();
         issueId = jiraClient.createIssue(engsbIssue);
         assertNotNull(issueId);
@@ -65,7 +65,7 @@ public class JiraServiceUT {
 
     @Test
     public void testAddComment() {
-        log.debug("test to add a command to an issue");
+        LOGGER.debug("test to add a command to an issue");
         jiraClient.addComment(issueId, "comment");
 
     }
