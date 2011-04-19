@@ -30,8 +30,6 @@ import com.dolby.jira.net.soap.jira.JiraSoapService;
 import com.dolby.jira.net.soap.jira.JiraSoapServiceService;
 import com.dolby.jira.net.soap.jira.JiraSoapServiceServiceLocator;
 
-
-
 /**
  * This represents a SOAP session with JIRA including that state of being logged in or not
  */
@@ -42,6 +40,9 @@ public class JiraSOAPSession {
     private JiraSoapService jiraSoapService;
     private String token;
     private String jiraURI;
+
+    public JiraSOAPSession() {
+    }
 
     public JiraSOAPSession(String jiraURI) {
         this.jiraURI = jiraURI;

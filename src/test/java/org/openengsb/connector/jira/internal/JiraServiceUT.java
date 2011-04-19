@@ -26,7 +26,6 @@ import org.openengsb.domain.issue.models.Issue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class JiraServiceUT {
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraServiceUT.class);
     // Login details
@@ -46,11 +45,12 @@ public class JiraServiceUT {
     private static String baseUrl = "http://jira.atlassian.com/rpc/soap/jirasoapservice-v2";
     private static String issueId;
 
-
     @BeforeClass
     public static void setUpClass() throws Exception {
         jiraSoapSession = new JiraSOAPSession(baseUrl);
-        jiraClient = new JiraService("id", jiraSoapSession, PROJECT_KEY);
+        jiraClient = new JiraService("id");
+        jiraClient.setSoapSession(jiraSoapSession);
+        jiraClient.setProjectKey(PROJECT_KEY);
         jiraClient.setJiraPassword(LOGIN_PASSWORD);
         jiraClient.setJiraUser(LOGIN_NAME);
         testCreateIssue();

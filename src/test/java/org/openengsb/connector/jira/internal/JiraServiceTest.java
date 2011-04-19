@@ -59,7 +59,9 @@ public class JiraServiceTest {
         jiraSoapService = mock(JiraSoapService.class);
         when(jiraSoapSession.getJiraSoapService()).thenReturn(jiraSoapService);
         when(jiraSoapSession.getAuthenticationToken()).thenReturn(authToken);
-        jiraClient = new JiraService("id", jiraSoapSession, projectKey);
+        jiraClient = new JiraService("id");
+        jiraClient.setSoapSession(jiraSoapSession);
+        jiraClient.setProjectKey(projectKey);
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
     }
@@ -72,7 +74,9 @@ public class JiraServiceTest {
         when(jiraSoapSession.getJiraSoapService()).thenReturn(jiraSoapService);
         when(jiraSoapSession.getAuthenticationToken()).thenReturn(authToken);
         doThrow(new RemoteException()).when(jiraSoapSession).connect(anyString(), anyString());
-        jiraClient = new JiraService("id", jiraSoapSession, projectKey);
+        jiraClient = new JiraService("id");
+        jiraClient.setSoapSession(jiraSoapSession);
+        jiraClient.setProjectKey(projectKey);
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
         jiraClient.createIssue(issue);

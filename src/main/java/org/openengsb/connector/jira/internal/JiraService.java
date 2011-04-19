@@ -32,6 +32,7 @@ import org.openengsb.connector.jira.internal.misc.StatusConverter;
 import org.openengsb.connector.jira.internal.misc.TypeConverter;
 import org.openengsb.core.api.AliveState;
 import org.openengsb.core.api.DomainMethodExecutionException;
+import org.openengsb.core.api.DomainMethodNotImplementedException;
 import org.openengsb.core.common.AbstractOpenEngSBService;
 import org.openengsb.domain.issue.IssueDomain;
 import org.openengsb.domain.issue.models.Issue;
@@ -45,7 +46,6 @@ import com.dolby.jira.net.soap.jira.RemoteFieldValue;
 import com.dolby.jira.net.soap.jira.RemoteIssue;
 import com.dolby.jira.net.soap.jira.RemoteVersion;
 
-
 public class JiraService extends AbstractOpenEngSBService implements IssueDomain {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraService.class);
@@ -57,11 +57,9 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
     private String projectKey;
     private String authToken;
 
-
-    public JiraService(String id, JiraSOAPSession jiraSoapSession, String projectKey) {
+    public JiraService(String id) {
         super(id);
-        this.jiraSoapSession = jiraSoapSession;
-        this.projectKey = projectKey;
+        this.jiraSoapSession = new JiraSOAPSession();
     }
 
     @Override
@@ -81,7 +79,6 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         }
         return issue.getKey();
     }
-
 
     @Override
     public void addComment(String issueKey, String commentString) {
@@ -115,7 +112,6 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         }
     }
 
-
     @Override
     public void moveIssuesFromReleaseToRelease(String releaseFromId, String releaseToId) {
         try {
@@ -129,7 +125,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
             RemoteFieldValue[] changes = new RemoteFieldValue[1];
             RemoteFieldValue change = new RemoteFieldValue();
             change.setId("fixVersions");
-            change.setValues(new String[]{version.getId()});
+            change.setValues(new String[]{ version.getId() });
 
             changes[0] = change;
             for (RemoteIssue issue : issues) {
@@ -208,6 +204,16 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         return report;
     }
 
+    @Override
+    public void addComponent(String arg0) {
+        throw new DomainMethodNotImplementedException();
+    }
+
+    @Override
+    public void removeComponent(String arg0) {
+        throw new DomainMethodNotImplementedException();
+    }
+
     private RemoteVersion getNextVersion(String authToken, JiraSoapService jiraSoapService, String releaseToId)
         throws RemoteException {
         RemoteVersion[] versions = jiraSoapService.getVersions(authToken, projectKey);
@@ -236,7 +242,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
             if (targetField != null && targetValue != null) {
                 RemoteFieldValue rfv = new RemoteFieldValue();
                 rfv.setId(targetField);
-                rfv.setValues(new String[]{targetValue});
+                rfv.setValues(new String[]{ targetValue });
                 remoteFields.add(rfv);
             }
         }
@@ -244,7 +250,6 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         remoteFields.toArray(remoteFieldArray);
         return remoteFieldArray;
     }
-
 
     private RemoteIssue convertIssue(Issue engsbIssue) {
         RemoteIssue remoteIssue = new RemoteIssue();
@@ -260,7 +265,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
 
         RemoteVersion version = new RemoteVersion();
         version.setId(engsbIssue.getDueVersion());
-        RemoteVersion[] remoteVersions = new RemoteVersion[]{version};
+        RemoteVersion[] remoteVersions = new RemoteVersion[]{ version };
         remoteIssue.setFixVersions(remoteVersions);
 
         return remoteIssue;
