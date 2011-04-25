@@ -23,10 +23,10 @@
   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0" >
   <feature name="openengsb-connector-jira" version="${project.version}" >
     <feature version="${openengsb.version.range}">openengsb-core</feature>
-    <feature version="${openengsb.version.range}">openengsb-domain-issue</feature>
+    <feature version="${openengsb.domain.issue.range}">openengsb-domain-issue</feature>
     <bundle>mvn:org.openengsb.wrapped/axis-all/${axis.wrapped.version}</bundle>
-    <bundle>mvn:org.openengsb.connector/openengsb-connector-jira/${project.version}</bundle>
     <bundle>mvn:org.openengsb.wrapped/com.dolby.jira.net.jira-soap/${jira.wrapped.version}</bundle>
+    <bundle>mvn:org.openengsb.connector/openengsb-connector-jira/${project.version}</bundle>
   </feature>
 </features>
 
