@@ -19,12 +19,7 @@ package org.openengsb.connector.jira.internal;
 
 import static junit.framework.Assert.assertNotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -50,7 +45,7 @@ public class JiraServiceUT {
     /**
      * testing server provided by jira
      */
-    private static String baseUrl = "http://localhost:8080/rpc/soap/jirasoapservice-v2?wsdl";//"http://jira.atlassian.com/rpc/soap/jirasoapservice-v2";
+    private static String baseUrl = "http://localhost:8080/rpc/soap/jirasoapservice-v2?wsdl";
     private static String issueId;
 
     @BeforeClass
@@ -80,10 +75,9 @@ public class JiraServiceUT {
     @Test
     public void testUpdateIssue() {
         HashMap<IssueAttribute, String> changes = new HashMap<IssueAttribute, String>();
-        changes.put(Issue.Field.COMPONENT, "bitte");
-        changes.put(Issue.Field.DESCRIPTION, "BIIIIITTTEE2");
-        changes.put(Issue.Field.SUMMARY, "BIIIIITTTEE2");
-        jiraClient.updateIssue(issueId, "oihoihoihoihoi", changes);
+        changes.put(Issue.Field.COMPONENT, "HAHA");
+        changes.put(Issue.Field.DESCRIPTION, "updated Description");
+        jiraClient.updateIssue(issueId, "commentTest", changes);
     }
 
     @Test
@@ -106,10 +100,10 @@ public class JiraServiceUT {
         Issue issue = new Issue();
         issue.setSummary("summary");
         issue.setDescription("description");
-        List<String> l = new ArrayList<String>();
-        l.add("bitte");
+        /*List<String> l = new ArrayList<String>();
+        l.add("10101");
         l.add("HAHA");
-        issue.setComponents(l);
+        issue.setComponents(l);*/
         issue.setReporter(LOGIN_NAME);
         issue.setOwner(LOGIN_NAME);
         issue.setPriority(Issue.Priority.NONE);

@@ -47,7 +47,7 @@ public final class FieldConverter {
         issueMap.put(Issue.Field.OWNER, "owner");
         issueMap.put(Issue.Field.REPORTER, "reporter");
         issueMap.put(Issue.Field.STATUS, "status");
-        issueMap.put(Issue.Field.COMPONENT, "component");
+        issueMap.put(Issue.Field.COMPONENT, "components");
     }
 
 }
