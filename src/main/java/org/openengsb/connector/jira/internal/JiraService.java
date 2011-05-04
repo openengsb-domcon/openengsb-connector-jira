@@ -59,7 +59,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
 
     public JiraService(String id) {
         super(id);
-        this.jiraSoapSession = new JiraSOAPSession();
+        jiraSoapSession = new JiraSOAPSession();
     }
 
     @Override
@@ -165,8 +165,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
     }
 
     @Override
-    public ArrayList<String> generateReleaseReport(String releaseId) {
-
+    public List<String> generateReleaseReport(String releaseId) {
         ArrayList<String> report = new ArrayList<String>();
         Map<String, List<String>> reports = new HashMap<String, List<String>>();
 
