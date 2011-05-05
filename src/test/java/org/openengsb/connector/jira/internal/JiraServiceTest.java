@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -167,7 +168,7 @@ public class JiraServiceTest {
 
         when(jiraSoapService.getIssuesFromJqlSearch(authToken, "fixVersion in (\"versionName\") and status in (6)",
                 1000)).thenReturn(values);
-        ArrayList<String> report = jiraClient.generateReleaseReport("versionName");
+        List<String> report = jiraClient.generateReleaseReport("versionName");
         ArrayList<String> expectedReport = new ArrayList<String>();
 
         expectedReport.add("** New Feature\n");
