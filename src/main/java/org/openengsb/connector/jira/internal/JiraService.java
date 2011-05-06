@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openengsb.connector.jira.internal.misc.FieldConverter;
-import org.openengsb.connector.jira.internal.misc.JiraValueConverter;
 import org.openengsb.connector.jira.internal.misc.PriorityConverter;
 import org.openengsb.connector.jira.internal.misc.StatusConverter;
 import org.openengsb.connector.jira.internal.misc.TypeConverter;
@@ -42,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dolby.jira.net.soap.jira.JiraSoapService;
 import com.dolby.jira.net.soap.jira.RemoteComment;
+import com.dolby.jira.net.soap.jira.RemoteComponent;
 import com.dolby.jira.net.soap.jira.RemoteFieldValue;
 import com.dolby.jira.net.soap.jira.RemoteIssue;
 import com.dolby.jira.net.soap.jira.RemoteVersion;
@@ -68,7 +68,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         try {
             JiraSoapService jiraSoapService = login();
 
-            issue = convertIssue(engsbIssue);
+            issue = convertIssue(engsbIssue, jiraSoapService);
             issue = jiraSoapService.createIssue(authToken, issue);
             LOGGER.info("Successfully created issue {}", issue.getKey());
         } catch (RemoteException e) {
@@ -102,7 +102,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         try {
             JiraSoapService jiraSoapService = login();
 
-            RemoteFieldValue[] values = convertChanges(changes);
+            RemoteFieldValue[] values = convertChanges(changes, jiraSoapService);
             jiraSoapService.updateIssue(authToken, issueKey, values);
         } catch (RemoteException e) {
             LOGGER.error("Error updating the issue . XMLRPC call failed. ");
@@ -120,7 +120,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
             RemoteVersion version = getNextVersion(authToken, jiraSoapService, releaseToId);
 
             RemoteIssue[] issues = jiraSoapService
-                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseFromId + "\") ", 1000);
+                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseFromId + "\") ", 50);
 
             RemoteFieldValue[] changes = new RemoteFieldValue[1];
             RemoteFieldValue change = new RemoteFieldValue();
@@ -230,19 +230,36 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         return state;
     }
 
-    private RemoteFieldValue[] convertChanges(HashMap<IssueAttribute, String> changes) {
+    private RemoteFieldValue[] convertChanges(HashMap<IssueAttribute, String> changes, JiraSoapService jiraSoapService)
+        throws RemoteException {
         Set<IssueAttribute> changedAttributes = new HashSet<IssueAttribute>(changes.keySet());
         ArrayList<RemoteFieldValue> remoteFields = new ArrayList<RemoteFieldValue>();
+        RemoteComponent[] projComps = jiraSoapService.getComponents(authToken, projectKey);
 
         for (IssueAttribute attribute : changedAttributes) {
             String targetField = FieldConverter.fromIssueField((Issue.Field) attribute);
-
-            String targetValue = JiraValueConverter.convert(changes.get(attribute));
+            RemoteFieldValue rfv = new RemoteFieldValue();
+            rfv.setId(targetField);
+            
+            String targetValue = changes.get(attribute);
             if (targetField != null && targetValue != null) {
-                RemoteFieldValue rfv = new RemoteFieldValue();
-                rfv.setId(targetField);
-                rfv.setValues(new String[]{ targetValue });
+                if (targetField.equals("components")) {
+                    if (targetValue.contains(",")) {
+                       //Name of component must not contain ,
+                        String[] splittedComps = targetValue.split(",");
+                        String[] comps = new String[splittedComps.length];
+                        for (int i = 0; i < splittedComps.length; i++) {
+                            comps[i] = convertComponent(splittedComps[i], projComps).getId();
+                        }
+                        rfv.setValues(comps);
+                    } else {
+                        rfv.setValues(new String[] { convertComponent(targetValue, projComps).getId() });
+                    }
+                } else {
+                    rfv.setValues(new String[] { targetValue });
+                }
                 remoteFields.add(rfv);
+
             }
         }
         RemoteFieldValue[] remoteFieldArray = new RemoteFieldValue[remoteFields.size()];
@@ -250,13 +267,23 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         return remoteFieldArray;
     }
 
-    private RemoteIssue convertIssue(Issue engsbIssue) {
+    private RemoteIssue convertIssue(Issue engsbIssue, JiraSoapService jiraSoapService) throws RemoteException {
         RemoteIssue remoteIssue = new RemoteIssue();
         remoteIssue.setSummary(engsbIssue.getSummary());
         remoteIssue.setDescription(engsbIssue.getDescription());
         remoteIssue.setReporter(engsbIssue.getReporter());
         remoteIssue.setAssignee(engsbIssue.getOwner());
         remoteIssue.setProject(projectKey);
+
+        List<String> engsbComps = engsbIssue.getComponents();
+        if (engsbComps != null) {
+            RemoteComponent[] comps = new RemoteComponent[engsbComps.size()];
+            RemoteComponent[] projComps = jiraSoapService.getComponents(authToken, projectKey);
+            for (int i = 0; i < engsbComps.size(); i++) {
+                comps[i] = convertComponent(engsbComps.get(i), projComps);
+            }
+            remoteIssue.setComponents(comps);
+        }
 
         remoteIssue.setPriority(PriorityConverter.fromIssuePriority(engsbIssue.getPriority()));
         remoteIssue.setStatus(StatusConverter.fromIssueStatus(engsbIssue.getStatus()));
@@ -268,6 +295,28 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         remoteIssue.setFixVersions(remoteVersions);
 
         return remoteIssue;
+    }
+    
+    private RemoteComponent convertComponent(String component, RemoteComponent[] projComps) {
+        boolean isNumber = false;
+        RemoteComponent c = new RemoteComponent();
+        try {
+            Integer.parseInt(component);
+            isNumber = true;
+        } catch (NumberFormatException e) {
+        }
+
+        if (!isNumber) {
+            for (RemoteComponent tmpComp : projComps) {
+                if (tmpComp.getName().equals(component)) {
+                    c.setId(tmpComp.getId());
+                    return c;
+                }
+            }
+        } else {
+            c.setId(component);            
+        }
+        return c;
     }
 
     private JiraSoapService login() {
