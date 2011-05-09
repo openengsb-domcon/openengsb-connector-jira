@@ -299,23 +299,17 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
     }
     
     private RemoteComponent convertComponent(String component, RemoteComponent[] projComps) {
-        boolean isNumber = false;
         RemoteComponent c = new RemoteComponent();
         try {
             Integer.parseInt(component);
-            isNumber = true;
+            c.setId(component); 
         } catch (NumberFormatException e) {
-        }
-
-        if (!isNumber) {
             for (RemoteComponent tmpComp : projComps) {
                 if (tmpComp.getName().equals(component)) {
                     c.setId(tmpComp.getId());
                     return c;
                 }
             }
-        } else {
-            c.setId(component);            
         }
         return c;
     }
