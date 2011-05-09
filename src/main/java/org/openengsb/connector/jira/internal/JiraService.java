@@ -120,7 +120,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
             RemoteVersion version = getNextVersion(authToken, jiraSoapService, releaseToId);
 
             RemoteIssue[] issues = jiraSoapService
-                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseFromId + "\") ", 50);
+                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseFromId + "\") ", 1000);
 
             RemoteFieldValue[] changes = new RemoteFieldValue[1];
             RemoteFieldValue change = new RemoteFieldValue();
@@ -298,24 +298,18 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         return remoteIssue;
     }
     
-    private RemoteComponent convertComponent(String component, RemoteComponent[] projComps) {
-        boolean isNumber = false;
+    private RemoteComponent convertComponent(String component, RemoteComponent[] projComps) {        
         RemoteComponent c = new RemoteComponent();
         try {
             Integer.parseInt(component);
-            isNumber = true;
+            c.setId(component);   
         } catch (NumberFormatException e) {
-        }
-
-        if (!isNumber) {
             for (RemoteComponent tmpComp : projComps) {
                 if (tmpComp.getName().equals(component)) {
                     c.setId(tmpComp.getId());
                     return c;
                 }
             }
-        } else {
-            c.setId(component);            
         }
         return c;
     }
