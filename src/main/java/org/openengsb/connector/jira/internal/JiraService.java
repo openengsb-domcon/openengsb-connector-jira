@@ -120,7 +120,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
             RemoteVersion version = getNextVersion(authToken, jiraSoapService, releaseToId);
 
             RemoteIssue[] issues = jiraSoapService
-                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseFromId + "\") ", 50);
+                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseFromId + "\") ", 1000);
 
             RemoteFieldValue[] changes = new RemoteFieldValue[1];
             RemoteFieldValue change = new RemoteFieldValue();
