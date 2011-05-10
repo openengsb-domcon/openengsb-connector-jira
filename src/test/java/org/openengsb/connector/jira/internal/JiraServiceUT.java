@@ -75,7 +75,7 @@ public class JiraServiceUT {
     @Test
     public void testUpdateIssue() {
         HashMap<IssueAttribute, String> changes = new HashMap<IssueAttribute, String>();
-        changes.put(Issue.Field.COMPONENT, "HAHA");
+        changes.put(Issue.Field.COMPONENT, "updComponent");
         changes.put(Issue.Field.DESCRIPTION, "updated Description");
         jiraClient.updateIssue(issueId, "commentTest", changes);
     }
@@ -100,10 +100,6 @@ public class JiraServiceUT {
         Issue issue = new Issue();
         issue.setSummary("summary");
         issue.setDescription("description");
-        /*List<String> l = new ArrayList<String>();
-        l.add("10101");
-        l.add("HAHA");
-        issue.setComponents(l);*/
         issue.setReporter(LOGIN_NAME);
         issue.setOwner(LOGIN_NAME);
         issue.setPriority(Issue.Priority.NONE);
