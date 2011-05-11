@@ -56,10 +56,10 @@ public class JiraServiceUT {
         jiraClient.setProjectKey(PROJECT_KEY);
         jiraClient.setJiraPassword(LOGIN_PASSWORD);
         jiraClient.setJiraUser(LOGIN_NAME);
-        testCreateIssue();
+        testCreateIssue_shouldCreateIssue();
     }
 
-    public static void testCreateIssue() {
+    public static void testCreateIssue_shouldCreateIssue() {
         LOGGER.debug("test to create an issue");
         Issue engsbIssue = createIssue();
         issueId = jiraClient.createIssue(engsbIssue);
@@ -67,13 +67,13 @@ public class JiraServiceUT {
     }
 
     @Test
-    public void testAddComment() {
+    public void testAddComment_shouldAddComment() {
         LOGGER.debug("test to add a command to an issue");
         jiraClient.addComment(issueId, "comment");
     }
     
     @Test
-    public void testUpdateIssue() {
+    public void testUpdateIssue_shouldUpdateIssue() {
         HashMap<IssueAttribute, String> changes = new HashMap<IssueAttribute, String>();
         changes.put(Issue.Field.COMPONENT, "updComponent");
         changes.put(Issue.Field.DESCRIPTION, "updated Description");
@@ -81,18 +81,18 @@ public class JiraServiceUT {
     }
 
     @Test
-    public void testMoveAllIssuesFromOneReleaseToAnotherRelease() {
+    public void testMoveAllIssuesFromOneReleaseToAnotherRelease_shouldMoveIssues() {
         jiraClient.moveIssuesFromReleaseToRelease("13203", "11410");
     }
 
     @Ignore("user has no rights to close a release")
     @Test
-    public void closeRelease() {
+    public void testcloseRelease_shouldCloseRelease() {
         jiraClient.closeRelease("Version 2.0");
     }
 
     @Test
-    public void testGenerateReleaseReport() {
+    public void testGenerateReleaseReport_shouldGenerateReport() {
         assertNotNull(jiraClient.generateReleaseReport("Version 2.0"));
     }
 
