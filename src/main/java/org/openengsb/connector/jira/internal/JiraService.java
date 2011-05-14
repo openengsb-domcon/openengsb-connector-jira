@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openengsb.connector.jira.internal.misc.FieldConverter;
-import org.openengsb.connector.jira.internal.misc.JiraValueConverter;
 import org.openengsb.connector.jira.internal.misc.PriorityConverter;
 import org.openengsb.connector.jira.internal.misc.StatusConverter;
 import org.openengsb.connector.jira.internal.misc.TypeConverter;
@@ -42,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.dolby.jira.net.soap.jira.JiraSoapService;
 import com.dolby.jira.net.soap.jira.RemoteComment;
+import com.dolby.jira.net.soap.jira.RemoteComponent;
 import com.dolby.jira.net.soap.jira.RemoteFieldValue;
 import com.dolby.jira.net.soap.jira.RemoteIssue;
 import com.dolby.jira.net.soap.jira.RemoteVersion;
@@ -68,7 +68,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         try {
             JiraSoapService jiraSoapService = login();
 
-            issue = convertIssue(engsbIssue);
+            issue = convertIssue(engsbIssue, jiraSoapService);
             issue = jiraSoapService.createIssue(authToken, issue);
             LOGGER.info("Successfully created issue {}", issue.getKey());
         } catch (RemoteException e) {
@@ -88,8 +88,9 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
             RemoteComment comment = new RemoteComment();
             comment.setBody(commentString);
             jiraSoapService.addComment(authToken, issueKey, comment);
+            LOGGER.info("Successfully added comment {}", commentString);
         } catch (RemoteException e) {
-            LOGGER.error("Error commenting issue . XMLRPC call failed. ");
+            LOGGER.error("Error commenting issue . XMLRPC call failed. {}", e);
             throw new DomainMethodExecutionException("RPC called failed", e);
         } finally {
             state = AliveState.DISCONNECTED;
@@ -102,8 +103,9 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         try {
             JiraSoapService jiraSoapService = login();
 
-            RemoteFieldValue[] values = convertChanges(changes);
+            RemoteFieldValue[] values = convertChanges(changes, jiraSoapService);
             jiraSoapService.updateIssue(authToken, issueKey, values);
+            LOGGER.info("Successfully updated issue {}", issueKey);
         } catch (RemoteException e) {
             LOGGER.error("Error updating the issue . XMLRPC call failed. ");
             throw new DomainMethodExecutionException("RPC called failed", e);
@@ -119,18 +121,20 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
 
             RemoteVersion version = getNextVersion(authToken, jiraSoapService, releaseToId);
 
-            RemoteIssue[] issues = jiraSoapService
-                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseFromId + "\") ", 1000);
+            RemoteIssue[] issues = jiraSoapService.getIssuesFromJqlSearch(authToken, "fixVersion in (\""
+                    + releaseFromId + "\") ", 1000);
 
             RemoteFieldValue[] changes = new RemoteFieldValue[1];
             RemoteFieldValue change = new RemoteFieldValue();
             change.setId("fixVersions");
-            change.setValues(new String[]{ version.getId() });
+            change.setValues(new String[] { version.getId() });
 
             changes[0] = change;
             for (RemoteIssue issue : issues) {
                 jiraSoapService.updateIssue(authToken, issue.getKey(), changes);
             }
+
+            LOGGER.info("Successfully moved {} to {}", releaseFromId, releaseToId);
         } catch (RemoteException e) {
             LOGGER.error("Error updating the issue . XMLRPC call failed. ");
             throw new DomainMethodExecutionException("RPC called failed", e);
@@ -156,6 +160,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
                 return;
             }
             jiraSoapService.releaseVersion(authToken, projectKey, version);
+            LOGGER.info("Successfully closed release {}", id);
         } catch (RemoteException e) {
             LOGGER.error("Error closing release, Remote exception ");
             throw new DomainMethodExecutionException("RPC called failed", e);
@@ -172,9 +177,8 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         try {
             JiraSoapService jiraSoapService = login();
 
-            RemoteIssue[] issues = jiraSoapService
-                    .getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseId + "\") and status in (6)",
-                            1000);
+            RemoteIssue[] issues = jiraSoapService.getIssuesFromJqlSearch(authToken, "fixVersion in (\"" + releaseId
+                    + "\") and status in (6)", 1000);
             for (RemoteIssue issue : issues) {
                 if ("6".equals(issue.getStatus())) {
                     List<String> issueList = new ArrayList<String>();
@@ -190,6 +194,8 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
                 report.addAll(reports.get(key));
                 report.add("\n");
             }
+
+            LOGGER.info("Successfully created release report {}", releaseId);
 
         } catch (RemoteException e) {
             LOGGER.error("Error generating release report. XMLRPC call failed. ");
@@ -222,6 +228,7 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
                 next = version;
             }
         }
+        LOGGER.info("Returning next version");
         return next;
     }
 
@@ -230,19 +237,40 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         return state;
     }
 
-    private RemoteFieldValue[] convertChanges(HashMap<IssueAttribute, String> changes) {
+    private RemoteFieldValue[] convertChanges(HashMap<IssueAttribute, String> changes, JiraSoapService jiraSoapService)
+        throws RemoteException {
         Set<IssueAttribute> changedAttributes = new HashSet<IssueAttribute>(changes.keySet());
         ArrayList<RemoteFieldValue> remoteFields = new ArrayList<RemoteFieldValue>();
+        RemoteComponent[] projComps = jiraSoapService.getComponents(authToken, projectKey);
 
         for (IssueAttribute attribute : changedAttributes) {
             String targetField = FieldConverter.fromIssueField((Issue.Field) attribute);
+            RemoteFieldValue rfv = new RemoteFieldValue();
+            rfv.setId(targetField);
 
-            String targetValue = JiraValueConverter.convert(changes.get(attribute));
+            String targetValue = changes.get(attribute);
             if (targetField != null && targetValue != null) {
-                RemoteFieldValue rfv = new RemoteFieldValue();
-                rfv.setId(targetField);
-                rfv.setValues(new String[]{ targetValue });
+                if (targetField.equals("components")) {
+                    // Name of component must not contain ,
+                    if (targetValue.contains(",")) {
+                        LOGGER.info("adding more than one component");
+                        String[] splittedComps = targetValue.split(",");
+                        String[] comps = new String[splittedComps.length];
+                        for (int i = 0; i < splittedComps.length; i++) {
+                            comps[i] = convertComponent(splittedComps[i], projComps).getId();
+                            LOGGER.info("adding component \"{}\"", comps[i]);
+                        }
+                        rfv.setValues(comps);
+                    } else {
+                        LOGGER.info("adding only one component");
+                        rfv.setValues(new String[] { convertComponent(targetValue, projComps).getId() });
+                    }
+                } else {
+                    LOGGER.info("adding change value");
+                    rfv.setValues(new String[] { targetValue });
+                }
                 remoteFields.add(rfv);
+
             }
         }
         RemoteFieldValue[] remoteFieldArray = new RemoteFieldValue[remoteFields.size()];
@@ -250,7 +278,8 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         return remoteFieldArray;
     }
 
-    private RemoteIssue convertIssue(Issue engsbIssue) {
+    private RemoteIssue convertIssue(Issue engsbIssue, JiraSoapService jiraSoapService) throws RemoteException {
+        LOGGER.info("Converting openengsb issue \"{}\" to remote issue", engsbIssue.getId());
         RemoteIssue remoteIssue = new RemoteIssue();
         remoteIssue.setSummary(engsbIssue.getSummary());
         remoteIssue.setDescription(engsbIssue.getDescription());
@@ -258,16 +287,51 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
         remoteIssue.setAssignee(engsbIssue.getOwner());
         remoteIssue.setProject(projectKey);
 
+        List<String> engsbComps = engsbIssue.getComponents();
+        if (engsbComps != null) {
+            LOGGER.info("Issue \"{}\" has components. Converting components", engsbIssue.getId());
+            remoteIssue.setComponents(getComponents(engsbIssue, jiraSoapService, engsbComps));
+        }
+
         remoteIssue.setPriority(PriorityConverter.fromIssuePriority(engsbIssue.getPriority()));
         remoteIssue.setStatus(StatusConverter.fromIssueStatus(engsbIssue.getStatus()));
         remoteIssue.setType(TypeConverter.fromIssueType(engsbIssue.getType()));
 
         RemoteVersion version = new RemoteVersion();
         version.setId(engsbIssue.getDueVersion());
-        RemoteVersion[] remoteVersions = new RemoteVersion[]{ version };
+        RemoteVersion[] remoteVersions = new RemoteVersion[] { version };
         remoteIssue.setFixVersions(remoteVersions);
 
         return remoteIssue;
+    }
+
+    private RemoteComponent[] getComponents(Issue engsbIssue, JiraSoapService jiraSoapService, List<String> engsbComps)
+        throws RemoteException {
+
+        RemoteComponent[] comps = new RemoteComponent[engsbComps.size()];
+        RemoteComponent[] projComps = jiraSoapService.getComponents(authToken, projectKey);
+        for (int i = 0; i < engsbComps.size(); i++) {
+            comps[i] = convertComponent(engsbComps.get(i), projComps);
+        }
+        return comps;
+    }
+
+    private RemoteComponent convertComponent(String component, RemoteComponent[] projComps) {
+        LOGGER.info("Converting update parameter \"{}\" to a component if available", component);
+        RemoteComponent c = new RemoteComponent();
+        try {
+            Integer.parseInt(component);
+            c.setId(component);
+        } catch (NumberFormatException e) {
+            LOGGER.info("Update parameter \"{}\" is not an id", component);
+            for (RemoteComponent tmpComp : projComps) {
+                if (tmpComp.getName().equals(component)) {
+                    c.setId(tmpComp.getId());
+                    return c;
+                }
+            }
+        }
+        return c;
     }
 
     private JiraSoapService login() {
@@ -278,8 +342,8 @@ public class JiraService extends AbstractOpenEngSBService implements IssueDomain
             authToken = jiraSoapSession.getAuthenticationToken();
             return jiraSoapSession.getJiraSoapService();
         } catch (RemoteException e) {
-            throw new DomainMethodExecutionException("Could not connect to server, maybe wrong user password/username"
-                    , e);
+            throw new DomainMethodExecutionException("Could not connect to server, maybe wrong user password/username",
+                    e);
         }
     }
 
