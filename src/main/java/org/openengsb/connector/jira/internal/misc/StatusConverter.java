@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Issue;
+import org.openengsb.domain.issue.models.Status;
 
 /**
  * status converter from OpenEngSB status to Jira status,
@@ -27,13 +27,13 @@ import org.openengsb.domain.issue.models.Issue;
  */
 public final class StatusConverter {
     
-    private static HashMap<Issue.Status, String> statusMap;
+    private static HashMap<Status, String> statusMap;
 
     private StatusConverter() {
 
     }
 
-    public static String fromIssueStatus(Issue.Status status) {
+    public static String fromIssueStatus(Status status) {
         if (statusMap == null) {
             initMap();
         }
@@ -41,10 +41,10 @@ public final class StatusConverter {
     }
 
     private static void initMap() {
-        statusMap = new HashMap<Issue.Status, String>();
-        statusMap.put(Issue.Status.CLOSED, "6");
-        statusMap.put(Issue.Status.NEW, "1");
-        statusMap.put(Issue.Status.UNASSIGNED, "2");
+        statusMap = new HashMap<Status, String>();
+        statusMap.put(Status.CLOSED, "6");
+        statusMap.put(Status.NEW, "1");
+        statusMap.put(Status.UNASSIGNED, "2");
     }
 
 }
