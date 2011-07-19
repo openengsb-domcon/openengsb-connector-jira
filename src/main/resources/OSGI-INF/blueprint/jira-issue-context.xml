@@ -29,7 +29,10 @@
       <entry key="domain" value="issue" />
       <entry key="connector" value="jira" />
     </service-properties>
-    <bean class="org.openengsb.connector.jira.internal.JiraServiceInstanceFactory" />
+    <bean class="org.openengsb.connector.jira.internal.JiraServiceInstanceFactory">
+      <property name="issueEvents" ref="issueEvents" />
+      <property name="ekbService" ref="ekbService" />    
+    </bean>
   </service>
 
   <service>
@@ -45,5 +48,8 @@
       <property name="bundleContext" ref="blueprintBundleContext" />
     </bean>
   </service>
+  
+  <reference id="issueEvents" interface="org.openengsb.domain.issue.IssueDomainEvents" />
+  <reference id="ekbService" interface="org.openengsb.core.api.ekb.EngineeringKnowledgeBaseService" />
 
 </blueprint>
