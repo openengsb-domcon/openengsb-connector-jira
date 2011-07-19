@@ -22,6 +22,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -36,9 +37,16 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.openengsb.core.api.DomainMethodExecutionException;
+import org.openengsb.core.api.ekb.EngineeringKnowledgeBaseService;
+import org.openengsb.domain.issue.IssueDomainEvents;
 import org.openengsb.domain.issue.models.Issue;
 import org.openengsb.domain.issue.models.IssueAttribute;
+import org.openengsb.domain.issue.models.Priority;
+import org.openengsb.domain.issue.models.Status;
+import org.openengsb.domain.issue.models.Type;
 
 import com.dolby.jira.net.soap.jira.JiraSoapService;
 import com.dolby.jira.net.soap.jira.RemoteComment;
@@ -65,6 +73,20 @@ public class JiraServiceTest {
         jiraClient.setProjectKey(projectKey);
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
+        
+        EngineeringKnowledgeBaseService ekbService = mock(EngineeringKnowledgeBaseService.class);
+        doAnswer(new Answer<java.lang.Object>() {
+            public java.lang.Object answer(InvocationOnMock invocation) {
+                return new TestIssue();
+            }
+        })
+            .when(ekbService).createEmptyModelObject(Issue.class);
+        
+        IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
+        
+        jiraClient.setEkbService(ekbService);
+        jiraClient.setIssueEvents(domainEvents);
+        
     }
 
     @Test(expected = DomainMethodExecutionException.class)
@@ -80,6 +102,21 @@ public class JiraServiceTest {
         jiraClient.setProjectKey(projectKey);
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
+        
+        EngineeringKnowledgeBaseService ekbService = mock(EngineeringKnowledgeBaseService.class);
+        doAnswer(new Answer<java.lang.Object>() {
+            public java.lang.Object answer(InvocationOnMock invocation) {
+                return new TestIssue();
+            }
+        })
+            .when(ekbService).createEmptyModelObject(Issue.class);
+        
+        IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
+        
+        jiraClient.setEkbService(ekbService);
+        jiraClient.setIssueEvents(domainEvents);
+        
+        
         jiraClient.createIssue(issue);
     }
 
@@ -114,6 +151,7 @@ public class JiraServiceTest {
     public void testUpdateIssue_shouldSuccess() throws Exception {
 
         RemoteIssue remoteIssue = mock(RemoteIssue.class);
+        when(remoteIssue.getId()).thenReturn("issueId");
         when(remoteIssue.getKey()).thenReturn("issueKey");
         when(jiraSoapService.getIssue(authToken, "id1")).thenReturn(remoteIssue);
         HashMap<IssueAttribute, String> changes = new HashMap<IssueAttribute, String>();
@@ -210,16 +248,16 @@ public class JiraServiceTest {
     }
 
     private Issue createIssue(String id) {
-        Issue issue = new Issue();
+        Issue issue = new TestIssue();
         issue.setId(id);
         issue.setSummary("summary");
         issue.setDescription("description");
         issue.setReporter("reporter");
         issue.setOwner("owner");
-        issue.setPriority(Issue.Priority.NONE);
-        issue.setStatus(Issue.Status.NEW);
+        issue.setPriority(Priority.NONE);
+        issue.setStatus(Status.NEW);
         issue.setDueVersion("versionID1");
-        issue.setType(Issue.Type.BUG);
+        issue.setType(Type.BUG);
 
         return issue;
     }
