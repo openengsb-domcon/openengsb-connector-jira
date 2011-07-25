@@ -389,9 +389,8 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
      */
     private void sendEvent(EDBEventType type, Issue issue) {
         String oid = "jira/" + jiraUser + "/" + issue.getId();
-        String role = "connector";
         try {
-            sendEDBEvent(type, issue, issueEvents, oid, role);
+            sendEDBEvent(type, issue, issueEvents, oid);
         } catch (EDBException e) {
             throw new DomainMethodExecutionException(e);
         }
