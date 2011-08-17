@@ -389,7 +389,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
      */
     private void sendEvent(EDBEventType type, Issue issue) {
         try {
-            sendEDBEvent(type, issue, issue.getId(), issueEvents);
+            sendEDBEvent(type, issue, issueEvents);
         } catch (EDBException e) {
             throw new DomainMethodExecutionException(e);
         }
