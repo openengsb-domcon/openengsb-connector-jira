@@ -17,8 +17,11 @@
 
 package org.openengsb.connector.jira.internal.misc;
 
-import org.openengsb.domain.issue.models.Issue;
+import org.openengsb.domain.issue.models.Field;
 import org.openengsb.domain.issue.models.IssueAttribute;
+import org.openengsb.domain.issue.models.Priority;
+import org.openengsb.domain.issue.models.Status;
+import org.openengsb.domain.issue.models.Type;
 
 /**
  *
@@ -31,17 +34,17 @@ public final class JiraValueConverter {
     }
 
     public static String convert(IssueAttribute type) {
-        if (type.getClass().equals(Issue.Priority.class)) {
-            return PriorityConverter.fromIssuePriority((Issue.Priority) type);
+        if (type.getClass().equals(Priority.class)) {
+            return PriorityConverter.fromIssuePriority((Priority) type);
         }
-        if (type.getClass().equals(Issue.Status.class)) {
-            return StatusConverter.fromIssueStatus((Issue.Status) type);
+        if (type.getClass().equals(Status.class)) {
+            return StatusConverter.fromIssueStatus((Status) type);
         }
-        if (type.getClass().equals(Issue.Type.class)) {
-            return TypeConverter.fromIssueType((Issue.Type) type);
+        if (type.getClass().equals(Type.class)) {
+            return TypeConverter.fromIssueType((Type) type);
         }
-        if (type.getClass().equals(Issue.Field.class)) {
-            return FieldConverter.fromIssueField((Issue.Field) type);
+        if (type.getClass().equals(Field.class)) {
+            return FieldConverter.fromIssueField((Field) type);
         }
         return null;
     }
@@ -49,19 +52,19 @@ public final class JiraValueConverter {
     public static String convert(String type) {
         type = type.toUpperCase();
         try {
-            return convert(Issue.Field.valueOf(type));
+            return convert(Field.valueOf(type));
         } catch (IllegalArgumentException ignore) { //ignore
         }
         try {
-            return convert(Issue.Type.valueOf(type));
+            return convert(Type.valueOf(type));
         } catch (IllegalArgumentException ignore) { //ignore
         }
         try {
-            return convert(Issue.Priority.valueOf(type));
+            return convert(Priority.valueOf(type));
         } catch (IllegalArgumentException ignore) { //ignore
         }
         try {
-            return convert(Issue.Status.valueOf(type));
+            return convert(Status.valueOf(type));
         } catch (IllegalArgumentException ignore) { //ignore
         }
         return null;

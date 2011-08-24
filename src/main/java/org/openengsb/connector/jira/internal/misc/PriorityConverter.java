@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Issue;
+import org.openengsb.domain.issue.models.Priority;
 
 /**
  * priority converter from OpenEngSB priority to Jira priority,
@@ -27,13 +27,13 @@ import org.openengsb.domain.issue.models.Issue;
  */
 public final class PriorityConverter {
     
-    private static HashMap<Issue.Priority, String> fieldMap;
+    private static HashMap<Priority, String> fieldMap;
 
     private PriorityConverter() {
 
     }
 
-    public static String fromIssuePriority(Issue.Priority priority) {
+    public static String fromIssuePriority(Priority priority) {
         if (fieldMap == null) {
             initMap();
         }
@@ -42,11 +42,11 @@ public final class PriorityConverter {
 
 
     private static void initMap() {
-        fieldMap = new HashMap<Issue.Priority, String>();
-        fieldMap.put(Issue.Priority.IMMEDIATE, "1");
-        fieldMap.put(Issue.Priority.HIGH, "2");
-        fieldMap.put(Issue.Priority.URGEND, "3");
-        fieldMap.put(Issue.Priority.NONE, "4");
-        fieldMap.put(Issue.Priority.LOW, "5");
+        fieldMap = new HashMap<Priority, String>();
+        fieldMap.put(Priority.IMMEDIATE, "1");
+        fieldMap.put(Priority.HIGH, "2");
+        fieldMap.put(Priority.URGEND, "3");
+        fieldMap.put(Priority.NONE, "4");
+        fieldMap.put(Priority.LOW, "5");
     }
 }

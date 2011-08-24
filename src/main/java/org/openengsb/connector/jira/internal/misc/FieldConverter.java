@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Issue;
+import org.openengsb.domain.issue.models.Field;
 
 /**
  * field converter from OpenEngSB field to Jira field,
@@ -27,13 +27,13 @@ import org.openengsb.domain.issue.models.Issue;
  */
 public final class FieldConverter {
 
-    private static HashMap<Issue.Field, String> issueMap;
+    private static HashMap<Field, String> issueMap;
 
     private FieldConverter() {
 
     }
 
-    public static String fromIssueField(Issue.Field issueField) {
+    public static String fromIssueField(Field issueField) {
         if (issueMap == null) {
             initMap();
         }
@@ -41,13 +41,13 @@ public final class FieldConverter {
     }
 
     private static void initMap() {
-        issueMap = new HashMap<Issue.Field, String>();
-        issueMap.put(Issue.Field.SUMMARY, "summary");
-        issueMap.put(Issue.Field.DESCRIPTION, "description");
-        issueMap.put(Issue.Field.OWNER, "owner");
-        issueMap.put(Issue.Field.REPORTER, "reporter");
-        issueMap.put(Issue.Field.STATUS, "status");
-        issueMap.put(Issue.Field.COMPONENT, "components");
+        issueMap = new HashMap<Field, String>();
+        issueMap.put(Field.SUMMARY, "summary");
+        issueMap.put(Field.DESCRIPTION, "description");
+        issueMap.put(Field.OWNER, "owner");
+        issueMap.put(Field.REPORTER, "reporter");
+        issueMap.put(Field.STATUS, "status");
+        issueMap.put(Field.COMPONENT, "components");
     }
 
 }
