@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Issue;
+import org.openengsb.domain.issue.models.Type;
 
 /**
  * type converter from OpenEngSB type to Jira type,
@@ -27,14 +27,14 @@ import org.openengsb.domain.issue.models.Issue;
  */
 public final class TypeConverter {
 
-    private static HashMap<Issue.Type, String> typeMap;
+    private static HashMap<Type, String> typeMap;
     private static HashMap<String, String> codeMap;
 
     private TypeConverter() {
 
     }
 
-    public static String fromIssueType(Issue.Type type) {
+    public static String fromIssueType(Type type) {
         if (typeMap == null) {
             initMap();
         }
@@ -42,11 +42,11 @@ public final class TypeConverter {
     }
 
     private static void initMap() {
-        typeMap = new HashMap<Issue.Type, String>();
-        typeMap.put(Issue.Type.BUG, "1");
-        typeMap.put(Issue.Type.NEW_FEATURE, "2");
-        typeMap.put(Issue.Type.TASK, "3");
-        typeMap.put(Issue.Type.IMPROVEMENT, "4");
+        typeMap = new HashMap<Type, String>();
+        typeMap.put(Type.BUG, "1");
+        typeMap.put(Type.NEW_FEATURE, "2");
+        typeMap.put(Type.TASK, "3");
+        typeMap.put(Type.IMPROVEMENT, "4");
     }
 
 
