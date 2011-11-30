@@ -18,7 +18,6 @@
 package org.openengsb.connector.jira.internal;
 
 import static junit.framework.Assert.assertNotNull;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
@@ -26,9 +25,7 @@ import java.util.HashMap;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.openengsb.core.api.ekb.EngineeringKnowledgeBaseService;
+import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.IssueDomainEvents;
 import org.openengsb.domain.issue.models.Field;
 import org.openengsb.domain.issue.models.Issue;
@@ -66,18 +63,7 @@ public class JiraServiceUT {
         jiraClient.setProjectKey(PROJECT_KEY);
         jiraClient.setJiraPassword(LOGIN_PASSWORD);
         jiraClient.setJiraUser(LOGIN_NAME);
-        
-        EngineeringKnowledgeBaseService ekbService = mock(EngineeringKnowledgeBaseService.class);
-        doAnswer(new Answer<java.lang.Object>() {
-            public java.lang.Object answer(InvocationOnMock invocation) {
-                return new TestIssue();
-            }
-        })
-            .when(ekbService).createEmptyModelObject(Issue.class);
-        
         IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
-        
-        jiraClient.setEkbService(ekbService);
         jiraClient.setIssueEvents(domainEvents);
         
         testCreateIssue_shouldCreateIssue();
@@ -121,7 +107,7 @@ public class JiraServiceUT {
     }
 
     private static Issue createIssue() {
-        Issue issue = new TestIssue();
+        Issue issue = ModelUtils.createEmptyModelObject(Issue.class);
         issue.setSummary("summary");
         issue.setDescription("description");
         issue.setReporter(LOGIN_NAME);

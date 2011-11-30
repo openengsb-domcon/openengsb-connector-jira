@@ -20,20 +20,17 @@ package org.openengsb.connector.jira.internal;
 import java.util.Map;
 
 import org.openengsb.core.api.Connector;
-import org.openengsb.core.api.ekb.EngineeringKnowledgeBaseService;
 import org.openengsb.core.common.AbstractConnectorInstanceFactory;
 import org.openengsb.domain.issue.IssueDomainEvents;
 
 public class JiraServiceInstanceFactory extends AbstractConnectorInstanceFactory<JiraService> {
     
     private IssueDomainEvents issueEvents;
-    private EngineeringKnowledgeBaseService ekbService;
 
     @Override
     public Connector createNewInstance(String id) {
         JiraService service = new JiraService(id);
         service.setIssueEvents(issueEvents);
-        service.setEkbService(ekbService);
         return service;
     }
 
@@ -48,9 +45,5 @@ public class JiraServiceInstanceFactory extends AbstractConnectorInstanceFactory
     
     public void setIssueEvents(IssueDomainEvents issueEvents) {
         this.issueEvents = issueEvents;
-    }
-
-    public void setEkbService(EngineeringKnowledgeBaseService ekbService) {
-        this.ekbService = ekbService;
     }
 }

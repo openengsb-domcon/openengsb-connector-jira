@@ -34,8 +34,8 @@ import org.openengsb.core.api.DomainMethodExecutionException;
 import org.openengsb.core.api.DomainMethodNotImplementedException;
 import org.openengsb.core.api.edb.EDBEventType;
 import org.openengsb.core.api.edb.EDBException;
-import org.openengsb.core.api.ekb.EngineeringKnowledgeBaseService;
 import org.openengsb.core.common.AbstractOpenEngSBConnectorService;
+import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.IssueDomain;
 import org.openengsb.domain.issue.IssueDomainEvents;
 import org.openengsb.domain.issue.models.Field;
@@ -56,7 +56,6 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraService.class);
     
     private IssueDomainEvents issueEvents;
-    private EngineeringKnowledgeBaseService ekbService;
 
     private AliveState state = AliveState.DISCONNECTED;
     private String jiraUser;
@@ -321,7 +320,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
     
     private Issue convertIssue(RemoteIssue remote) {
         LOGGER.info("Converting remote issue \"{}\" to openengsb issue", remote.getId());
-        Issue issue = ekbService.createEmptyModelObject(Issue.class);
+        Issue issue = ModelUtils.createEmptyModelObject(Issue.class);
         issue.setSummary(remote.getSummary());
         issue.setDescription(remote.getDescription());
         issue.setReporter(remote.getReporter());
@@ -437,9 +436,5 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
     
     public void setIssueEvents(IssueDomainEvents issueEvents) {
         this.issueEvents = issueEvents;
-    }
-
-    public void setEkbService(EngineeringKnowledgeBaseService ekbService) {
-        this.ekbService = ekbService;
     }
 }

@@ -22,7 +22,6 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,10 +36,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openengsb.core.api.DomainMethodExecutionException;
-import org.openengsb.core.api.ekb.EngineeringKnowledgeBaseService;
+import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.IssueDomainEvents;
 import org.openengsb.domain.issue.models.Issue;
 import org.openengsb.domain.issue.models.IssueAttribute;
@@ -74,19 +71,8 @@ public class JiraServiceTest {
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
         
-        EngineeringKnowledgeBaseService ekbService = mock(EngineeringKnowledgeBaseService.class);
-        doAnswer(new Answer<java.lang.Object>() {
-            public java.lang.Object answer(InvocationOnMock invocation) {
-                return new TestIssue();
-            }
-        })
-            .when(ekbService).createEmptyModelObject(Issue.class);
-        
         IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
-        
-        jiraClient.setEkbService(ekbService);
         jiraClient.setIssueEvents(domainEvents);
-        
     }
 
     @Test(expected = DomainMethodExecutionException.class)
@@ -103,19 +89,8 @@ public class JiraServiceTest {
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
         
-        EngineeringKnowledgeBaseService ekbService = mock(EngineeringKnowledgeBaseService.class);
-        doAnswer(new Answer<java.lang.Object>() {
-            public java.lang.Object answer(InvocationOnMock invocation) {
-                return new TestIssue();
-            }
-        })
-            .when(ekbService).createEmptyModelObject(Issue.class);
-        
         IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
-        
-        jiraClient.setEkbService(ekbService);
         jiraClient.setIssueEvents(domainEvents);
-        
         
         jiraClient.createIssue(issue);
     }
@@ -248,7 +223,7 @@ public class JiraServiceTest {
     }
 
     private Issue createIssue(String id) {
-        Issue issue = new TestIssue();
+        Issue issue = ModelUtils.createEmptyModelObject(Issue.class);
         issue.setId(id);
         issue.setSummary("summary");
         issue.setDescription("description");
