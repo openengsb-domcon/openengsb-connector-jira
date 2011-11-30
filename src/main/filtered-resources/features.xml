@@ -22,11 +22,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0" >
   <feature name="openengsb-connector-jira" version="${project.version}" >
-    <feature version="${openengsb.version.range}">openengsb-core</feature>
+    <feature version="${openengsb.version.range}">openengsb-framework</feature>
     <feature version="${openengsb.domain.range}">openengsb-domain-issue</feature>
     <bundle>mvn:org.openengsb.wrapped/axis-all/${axis.wrapped.version}</bundle>
     <bundle>mvn:org.openengsb.wrapped/com.dolby.jira.net.jira-soap/${jira.wrapped.version}</bundle>
-    <bundle>mvn:org.openengsb.connector/openengsb-connector-jira/${project.version}</bundle>
+    <bundle>mvn:org.openengsb.connector/org.openengsb.connector.jira/${project.version}</bundle>
   </feature>
 </features>
 
