@@ -36,11 +36,11 @@ import org.openengsb.core.api.edb.EDBEventType;
 import org.openengsb.core.api.edb.EDBException;
 import org.openengsb.core.common.AbstractOpenEngSBConnectorService;
 import org.openengsb.core.common.util.ModelUtils;
+import org.openengsb.domain.issue.Field;
+import org.openengsb.domain.issue.Issue;
+import org.openengsb.domain.issue.IssueAttribute;
 import org.openengsb.domain.issue.IssueDomain;
 import org.openengsb.domain.issue.IssueDomainEvents;
-import org.openengsb.domain.issue.models.Field;
-import org.openengsb.domain.issue.models.Issue;
-import org.openengsb.domain.issue.models.IssueAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

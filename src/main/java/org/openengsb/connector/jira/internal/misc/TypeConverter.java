@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Type;
+import org.openengsb.domain.issue.Type;
 
 /**
  * type converter from OpenEngSB type to Jira type,

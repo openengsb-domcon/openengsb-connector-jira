@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Priority;
+import org.openengsb.domain.issue.Priority;
 
 /**
  * priority converter from OpenEngSB priority to Jira priority,

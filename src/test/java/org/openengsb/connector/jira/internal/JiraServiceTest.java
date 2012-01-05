@@ -38,12 +38,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.openengsb.core.api.DomainMethodExecutionException;
 import org.openengsb.core.common.util.ModelUtils;
+import org.openengsb.domain.issue.Issue;
+import org.openengsb.domain.issue.IssueAttribute;
 import org.openengsb.domain.issue.IssueDomainEvents;
-import org.openengsb.domain.issue.models.Issue;
-import org.openengsb.domain.issue.models.IssueAttribute;
-import org.openengsb.domain.issue.models.Priority;
-import org.openengsb.domain.issue.models.Status;
-import org.openengsb.domain.issue.models.Type;
+import org.openengsb.domain.issue.Priority;
+import org.openengsb.domain.issue.Status;
+import org.openengsb.domain.issue.Type;
 
 import com.dolby.jira.net.soap.jira.JiraSoapService;
 import com.dolby.jira.net.soap.jira.RemoteComment;

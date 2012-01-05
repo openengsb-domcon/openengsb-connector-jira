@@ -21,10 +21,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import org.junit.Test;
-import org.openengsb.domain.issue.models.Field;
-import org.openengsb.domain.issue.models.Priority;
-import org.openengsb.domain.issue.models.Status;
-import org.openengsb.domain.issue.models.Type;
+import org.openengsb.domain.issue.Field;
+import org.openengsb.domain.issue.Priority;
+import org.openengsb.domain.issue.Status;
+import org.openengsb.domain.issue.Type;
 
 /**
  *

@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Field;
+import org.openengsb.domain.issue.Field;
 
 /**
  * field converter from OpenEngSB field to Jira field,

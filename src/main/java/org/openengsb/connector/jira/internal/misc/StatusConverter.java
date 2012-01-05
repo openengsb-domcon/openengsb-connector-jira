@@ -19,7 +19,7 @@ package org.openengsb.connector.jira.internal.misc;
 
 import java.util.HashMap;
 
-import org.openengsb.domain.issue.models.Status;
+import org.openengsb.domain.issue.Status;
 
 /**
  * status converter from OpenEngSB status to Jira status,
