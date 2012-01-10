@@ -34,7 +34,7 @@
     <jira.version>4.0</jira.version>
     <jira.wrapped.version>4.0.0.w1</jira.wrapped.version>
     <openengsb.domain.version>2.0.0</openengsb.domain.version>
-    <openengsb.domain.range>[2.0,2.1)</openengsb.domain.range>
+    <openengsb.domain.range>[2.0,3)</openengsb.domain.range>
     <openengsb.framework.version>2.1.2</openengsb.framework.version>
   </properties>
 
