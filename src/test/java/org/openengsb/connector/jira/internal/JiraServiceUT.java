@@ -25,11 +25,11 @@ import java.util.HashMap;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openengsb.core.api.ekb.PersistInterface;
 import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.Field;
 import org.openengsb.domain.issue.Issue;
 import org.openengsb.domain.issue.IssueAttribute;
-import org.openengsb.domain.issue.IssueDomainEvents;
 import org.openengsb.domain.issue.Priority;
 import org.openengsb.domain.issue.Status;
 import org.openengsb.domain.issue.Type;
@@ -63,8 +63,8 @@ public class JiraServiceUT {
         jiraClient.setProjectKey(PROJECT_KEY);
         jiraClient.setJiraPassword(LOGIN_PASSWORD);
         jiraClient.setJiraUser(LOGIN_NAME);
-        IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
-        jiraClient.setIssueEvents(domainEvents);
+        PersistInterface persistInterface = mock(PersistInterface.class);
+        jiraClient.setPersistInterface(persistInterface);
         
         testCreateIssue_shouldCreateIssue();
     }

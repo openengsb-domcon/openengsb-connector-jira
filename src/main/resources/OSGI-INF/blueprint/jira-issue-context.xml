@@ -30,7 +30,7 @@
       <entry key="connector" value="jira" />
     </service-properties>
     <bean class="org.openengsb.connector.jira.internal.JiraServiceInstanceFactory">
-      <property name="issueEvents" ref="issueEvents" />
+      <property name="persistInterface" ref="persistInterface" />
     </bean>
   </service>
 
@@ -48,6 +48,6 @@
     </bean>
   </service>
   
-  <reference id="issueEvents" interface="org.openengsb.domain.issue.IssueDomainEvents" />
+  <reference id="persistInterface" interface="org.openengsb.core.api.ekb.PersistInterface" />
 
 </blueprint>

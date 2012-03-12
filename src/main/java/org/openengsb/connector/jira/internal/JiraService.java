@@ -32,15 +32,14 @@ import org.openengsb.connector.jira.internal.misc.TypeConverter;
 import org.openengsb.core.api.AliveState;
 import org.openengsb.core.api.DomainMethodExecutionException;
 import org.openengsb.core.api.DomainMethodNotImplementedException;
-import org.openengsb.core.api.edb.EDBEventType;
-import org.openengsb.core.api.edb.EDBException;
+import org.openengsb.core.api.ekb.EKBCommit;
+import org.openengsb.core.api.ekb.PersistInterface;
 import org.openengsb.core.common.AbstractOpenEngSBConnectorService;
 import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.Field;
 import org.openengsb.domain.issue.Issue;
 import org.openengsb.domain.issue.IssueAttribute;
 import org.openengsb.domain.issue.IssueDomain;
-import org.openengsb.domain.issue.IssueDomainEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraService.class);
     
-    private IssueDomainEvents issueEvents;
+    private PersistInterface persistInterface;
 
     private AliveState state = AliveState.DISCONNECTED;
     private String jiraUser;
@@ -78,8 +77,8 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
             issue = convertIssue(engsbIssue, jiraSoapService);
             issue = jiraSoapService.createIssue(authToken, issue);
             LOGGER.info("Successfully created issue {}", issue.getKey());
-            
-            sendEvent(EDBEventType.INSERT, engsbIssue);
+            EKBCommit commit = createEKBCommit().addInsert(engsbIssue);
+            persistInterface.commit(commit);
         } catch (RemoteException e) {
             LOGGER.error("Error creating issue {}. XMLRPC call failed.", engsbIssue.getDescription());
             throw new DomainMethodExecutionException("RPC called failed", e);
@@ -117,7 +116,8 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
             LOGGER.info("Successfully updated issue {}", issueKey);
             RemoteIssue issue = jiraSoapService.getIssueById(authToken, issueKey);
             if(issue != null) {
-                sendEvent(EDBEventType.UPDATE, convertIssue(issue));
+                EKBCommit commit = createEKBCommit().addUpdate(convertIssue(issue));
+                persistInterface.commit(commit);
             }
         } catch (RemoteException e) {
             LOGGER.error("Error updating the issue . XMLRPC call failed. ");
@@ -381,18 +381,6 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
                     e);
         }
     }
-    
-    /**
-     * Sends a CUD event. The type is defined by the enumeration EDBEventType. Also the oid and the role are defined
-     * here.
-     */
-    private void sendEvent(EDBEventType type, Issue issue) {
-        try {
-            sendEDBEvent(type, issue, issueEvents);
-        } catch (EDBException e) {
-            throw new DomainMethodExecutionException(e);
-        }
-    }
 
     public AliveState getState() {
         return state;
@@ -434,7 +422,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
         this.projectKey = projectKey;
     }
     
-    public void setIssueEvents(IssueDomainEvents issueEvents) {
-        this.issueEvents = issueEvents;
+    public void setPersistInterface(PersistInterface persistInterface) {
+        this.persistInterface = persistInterface    ;
     }
 }

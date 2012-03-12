@@ -20,17 +20,17 @@ package org.openengsb.connector.jira.internal;
 import java.util.Map;
 
 import org.openengsb.core.api.Connector;
+import org.openengsb.core.api.ekb.PersistInterface;
 import org.openengsb.core.common.AbstractConnectorInstanceFactory;
-import org.openengsb.domain.issue.IssueDomainEvents;
 
 public class JiraServiceInstanceFactory extends AbstractConnectorInstanceFactory<JiraService> {
     
-    private IssueDomainEvents issueEvents;
+    private PersistInterface persistInterface;
 
     @Override
     public Connector createNewInstance(String id) {
         JiraService service = new JiraService(id);
-        service.setIssueEvents(issueEvents);
+        service.setPersistInterface(persistInterface);
         return service;
     }
 
@@ -43,7 +43,7 @@ public class JiraServiceInstanceFactory extends AbstractConnectorInstanceFactory
         instance.setProjectKey(attributes.get("jira.project"));
     }
     
-    public void setIssueEvents(IssueDomainEvents issueEvents) {
-        this.issueEvents = issueEvents;
+    public void setPersistInterface(PersistInterface persistInterface) {
+        this.persistInterface = persistInterface;
     }
 }

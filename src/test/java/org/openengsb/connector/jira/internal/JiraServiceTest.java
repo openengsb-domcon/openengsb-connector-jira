@@ -37,10 +37,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.openengsb.core.api.DomainMethodExecutionException;
+import org.openengsb.core.api.ekb.PersistInterface;
 import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.Issue;
 import org.openengsb.domain.issue.IssueAttribute;
-import org.openengsb.domain.issue.IssueDomainEvents;
 import org.openengsb.domain.issue.Priority;
 import org.openengsb.domain.issue.Status;
 import org.openengsb.domain.issue.Type;
@@ -71,8 +71,8 @@ public class JiraServiceTest {
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
         
-        IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
-        jiraClient.setIssueEvents(domainEvents);
+        PersistInterface persistInterface = mock(PersistInterface.class);
+        jiraClient.setPersistInterface(persistInterface);
     }
 
     @Test(expected = DomainMethodExecutionException.class)
@@ -89,8 +89,8 @@ public class JiraServiceTest {
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
         
-        IssueDomainEvents domainEvents = mock(IssueDomainEvents.class);
-        jiraClient.setIssueEvents(domainEvents);
+        PersistInterface persistInterface = mock(PersistInterface.class);
+        jiraClient.setPersistInterface(persistInterface);
         
         jiraClient.createIssue(issue);
     }
