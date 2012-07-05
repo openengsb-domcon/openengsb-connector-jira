@@ -18,15 +18,12 @@
 package org.openengsb.connector.jira.internal;
 
 import static junit.framework.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openengsb.core.api.ekb.PersistInterface;
-import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.Field;
 import org.openengsb.domain.issue.Issue;
 import org.openengsb.domain.issue.IssueAttribute;
@@ -63,8 +60,7 @@ public class JiraServiceUT {
         jiraClient.setProjectKey(PROJECT_KEY);
         jiraClient.setJiraPassword(LOGIN_PASSWORD);
         jiraClient.setJiraUser(LOGIN_NAME);
-        PersistInterface persistInterface = mock(PersistInterface.class);
-        jiraClient.setPersistInterface(persistInterface);
+        jiraClient.setCommitHandler(new JiraCommitHandler());
         
         testCreateIssue_shouldCreateIssue();
     }
@@ -107,7 +103,7 @@ public class JiraServiceUT {
     }
 
     private static Issue createIssue() {
-        Issue issue = ModelUtils.createEmptyModelObject(Issue.class);
+        Issue issue = new Issue();
         issue.setSummary("summary");
         issue.setDescription("description");
         issue.setReporter(LOGIN_NAME);

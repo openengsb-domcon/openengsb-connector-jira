@@ -32,10 +32,7 @@ import org.openengsb.connector.jira.internal.misc.TypeConverter;
 import org.openengsb.core.api.AliveState;
 import org.openengsb.core.api.DomainMethodExecutionException;
 import org.openengsb.core.api.DomainMethodNotImplementedException;
-import org.openengsb.core.api.ekb.EKBCommit;
-import org.openengsb.core.api.ekb.PersistInterface;
 import org.openengsb.core.common.AbstractOpenEngSBConnectorService;
-import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.Field;
 import org.openengsb.domain.issue.Issue;
 import org.openengsb.domain.issue.IssueAttribute;
@@ -54,7 +51,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraService.class);
     
-    private PersistInterface persistInterface;
+    private JiraCommitHandler commitHandler;
 
     private AliveState state = AliveState.DISCONNECTED;
     private String jiraUser;
@@ -77,8 +74,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
             issue = convertIssue(engsbIssue, jiraSoapService);
             issue = jiraSoapService.createIssue(authToken, issue);
             LOGGER.info("Successfully created issue {}", issue.getKey());
-            EKBCommit commit = createEKBCommit().addInsert(engsbIssue);
-            persistInterface.commit(commit);
+            commitHandler.commitInsertIssue(engsbIssue, createEKBCommit());
         } catch (RemoteException e) {
             LOGGER.error("Error creating issue {}. XMLRPC call failed.", engsbIssue.getDescription());
             throw new DomainMethodExecutionException("RPC called failed", e);
@@ -116,8 +112,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
             LOGGER.info("Successfully updated issue {}", issueKey);
             RemoteIssue issue = jiraSoapService.getIssueById(authToken, issueKey);
             if(issue != null) {
-                EKBCommit commit = createEKBCommit().addUpdate(convertIssue(issue));
-                persistInterface.commit(commit);
+                commitHandler.commitUpdateIssue(convertIssue(issue), createEKBCommit());
             }
         } catch (RemoteException e) {
             LOGGER.error("Error updating the issue . XMLRPC call failed. ");
@@ -320,7 +315,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
     
     private Issue convertIssue(RemoteIssue remote) {
         LOGGER.info("Converting remote issue \"{}\" to openengsb issue", remote.getId());
-        Issue issue = ModelUtils.createEmptyModelObject(Issue.class);
+        Issue issue = new Issue();
         issue.setSummary(remote.getSummary());
         issue.setDescription(remote.getDescription());
         issue.setReporter(remote.getReporter());
@@ -422,7 +417,7 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
         this.projectKey = projectKey;
     }
     
-    public void setPersistInterface(PersistInterface persistInterface) {
-        this.persistInterface = persistInterface    ;
+    public void setCommitHandler(JiraCommitHandler commitHandler) {
+        this.commitHandler = commitHandler;
     }
 }

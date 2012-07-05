@@ -37,8 +37,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.openengsb.core.api.DomainMethodExecutionException;
-import org.openengsb.core.api.ekb.PersistInterface;
-import org.openengsb.core.common.util.ModelUtils;
 import org.openengsb.domain.issue.Issue;
 import org.openengsb.domain.issue.IssueAttribute;
 import org.openengsb.domain.issue.Priority;
@@ -70,9 +68,7 @@ public class JiraServiceTest {
         jiraClient.setProjectKey(projectKey);
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
-        
-        PersistInterface persistInterface = mock(PersistInterface.class);
-        jiraClient.setPersistInterface(persistInterface);
+        jiraClient.setCommitHandler(new JiraCommitHandler());
     }
 
     @Test(expected = DomainMethodExecutionException.class)
@@ -89,8 +85,7 @@ public class JiraServiceTest {
         jiraClient.setJiraPassword("pwd");
         jiraClient.setJiraUser("user");
         
-        PersistInterface persistInterface = mock(PersistInterface.class);
-        jiraClient.setPersistInterface(persistInterface);
+        jiraClient.setCommitHandler(new JiraCommitHandler());
         
         jiraClient.createIssue(issue);
     }
@@ -223,7 +218,7 @@ public class JiraServiceTest {
     }
 
     private Issue createIssue(String id) {
-        Issue issue = ModelUtils.createEmptyModelObject(Issue.class);
+        Issue issue = new Issue();
         issue.setId(id);
         issue.setSummary("summary");
         issue.setDescription("description");
@@ -233,7 +228,6 @@ public class JiraServiceTest {
         issue.setStatus(Status.NEW);
         issue.setDueVersion("versionID1");
         issue.setType(Type.BUG);
-
         return issue;
     }
 }

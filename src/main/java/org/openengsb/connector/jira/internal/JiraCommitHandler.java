@@ -17,34 +17,37 @@
 
 package org.openengsb.connector.jira.internal;
 
-import java.util.Map;
-
-import org.openengsb.core.api.Connector;
+import org.openengsb.core.api.ekb.EKBCommit;
 import org.openengsb.core.api.ekb.PersistInterface;
-import org.openengsb.core.common.AbstractConnectorInstanceFactory;
+import org.openengsb.domain.issue.Issue;
 
-public class JiraServiceInstanceFactory extends AbstractConnectorInstanceFactory<JiraService> {
-    
+/**
+ * Class that extracts the commiting of models to the persist interface from the jira connector. In that way easier
+ * testing is possible.
+ */
+public class JiraCommitHandler {
     private PersistInterface persistInterface;
 
-    @Override
-    public Connector createNewInstance(String id) {
-        JiraService service = new JiraService(id);
-        JiraCommitHandler commitHandler = new JiraCommitHandler();
-        commitHandler.setPersistInterface(persistInterface);
-        service.setCommitHandler(commitHandler);
-        return service;
+    /**
+     * Commits a new issue to the persist interface. If the persist interface isn't set, the call is ignored.
+     */
+    public void commitInsertIssue(Issue issue, EKBCommit commit) {
+        if (persistInterface != null) {
+            commit.addInsert(issue);
+            persistInterface.commit(commit);
+        }
     }
 
-    @Override
-    public void doApplyAttributes(JiraService instance, Map<String, String> attributes) {
-        instance.setJiraUser(attributes.get("jira.user"));
-        instance.setJiraPassword(attributes.get("jira.password"));
-
-        instance.getSoapSession().setJiraURI(attributes.get("jira.uri"));
-        instance.setProjectKey(attributes.get("jira.project"));
+    /**
+     * Commits an updated issue to the persist interface. If the persist interface isn't set, the call is ignored.
+     */
+    public void commitUpdateIssue(Issue issue, EKBCommit commit) {
+        if (persistInterface != null) {
+            commit.addUpdate(issue);
+            persistInterface.commit(commit);
+        }
     }
-    
+
     public void setPersistInterface(PersistInterface persistInterface) {
         this.persistInterface = persistInterface;
     }
