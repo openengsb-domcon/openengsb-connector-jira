@@ -32,6 +32,7 @@ import org.openengsb.connector.jira.internal.misc.TypeConverter;
 import org.openengsb.core.api.AliveState;
 import org.openengsb.core.api.DomainMethodExecutionException;
 import org.openengsb.core.api.DomainMethodNotImplementedException;
+import org.openengsb.core.api.ekb.EKBCommit;
 import org.openengsb.core.common.AbstractOpenEngSBConnectorService;
 import org.openengsb.domain.issue.Field;
 import org.openengsb.domain.issue.Issue;
@@ -120,6 +121,12 @@ public class JiraService extends AbstractOpenEngSBConnectorService implements Is
         } finally {
             state = AliveState.DISCONNECTED;
         }
+    }
+    
+    private EKBCommit createEKBCommit() {
+        EKBCommit commit = new EKBCommit();
+        commit.setDomainId(domainId).setConnectorId(connectorId).setInstanceId(instanceId);
+        return commit;
     }
 
     @Override
